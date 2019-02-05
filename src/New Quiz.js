@@ -11,7 +11,7 @@ export class Quiz extends React.Component {
                     results: [], queNo: 30, isLoading: true, errors: null,  
                     checked1: false, checked2: false, checked3: false, checked4: false,
                     wrong: [], btnName: 'Next', submit: false, time: {},
-                    seconds: 59, attempt: 0, counter: 0, selectedAnswers: [],score:0,options:[]
+                    seconds: 30, attempt: 0, counter: 0, selectedAnswers: [],score:0,options:[]
                 };
                 // this.handleChange = this.handleChange.bind(this);
                 // this.handleSubmit = this.handleSubmit.bind(this);
@@ -27,7 +27,7 @@ export class Quiz extends React.Component {
 
             getQuestion(difficulty) {
                 axios
-                    .get(`https://opentdb.com/api.php?amount=30&difficulty=${difficulty}&type=multiple`)
+                    .get(`https://opentdb.com/api.php?amount=5&difficulty=${difficulty}&type=multiple`)
                     .then(response => {
                         console.log(response.data.results, `${difficulty} call`);
                         let results = response.data.results
@@ -66,7 +66,6 @@ export class Quiz extends React.Component {
                     this.state.wrong.push({ question: this.state.results[this.state.queNo].question, answer: this.state.results[this.state.queNo].correct_answer })
                     this.setState({ wrong: this.state.wrong })
                 }
-
                 var obj = this.state.selectedAnswers;
                 var select = e.target.value
                 console.log("for selected question number " + (this.state.queNo + 1) + " answer is " + select + " selected");
@@ -106,11 +105,9 @@ export class Quiz extends React.Component {
             }
 
     _ToggleNext() {
-        
         if (this.state.queNo === this.state.results.length - 1) {
             this.setState({ btselectedAnswersnName: 'Submit', submit: true })
-            return;
-           
+            return;      
         }
         // if(this.state.score>=3){
         //     this.getQuestion('medium');
@@ -151,7 +148,7 @@ export class Quiz extends React.Component {
             break;
             default:
         }  
-        console.log(this.state.queNo+1,"QuesNo",this.state.selectedAnswers.length,"Selected answer lenght");
+        // console.log(this.state.queNo+1,"QuesNo",this.state.selectedAnswers.length,"Selected answer length");
         if(this.state.queNo+1>=this.state.selectedAnswers.length)
         {
             this.setState({
@@ -159,13 +156,11 @@ export class Quiz extends React.Component {
                 attempt: this.state.attempt + 1,
             })
         }
-        
         this.setState({
             queNo: this.state.queNo + 1,   
-            seconds: 60
+            seconds: 30
         }, this.startTimer())
     }
-
     _TogglePrev() {
         if (this.state.queNo === 0)
             return;
@@ -210,16 +205,14 @@ export class Quiz extends React.Component {
             // attempt: this.state.attempt - 1,
             queNo: this.state.queNo - 1,
             btnName: 'Next',
-            
         })
         
     }
- 
     _ShowQue = (e) => {
         let options=[];
-        options=[this.state.results[this.state.queNo].correct_answer,...this.state.results[this.state.queNo].incorrect_answers]
-        console.log(parseInt(options.indexOf(this.state.selectedAnswers[this.state.queNo+1])))
-        switch(parseInt(options.indexOf(this.state.selectedAnswers[this.state.queNo])))
+        options=[this.state.results[parseInt(e.target.textContent)].correct_answer,...this.state.results[parseInt(e.target.textContent)].incorrect_answers]
+        // console.log(options.indexOf(this.state.selectedAnswers[parseInt(e.target.textContent)]))
+        switch(parseInt(options.indexOf(this.state.selectedAnswers[parseInt(e.target.textContent)])))
         {
             case 0: this.setState({
                 checked1:true,
@@ -253,19 +246,13 @@ export class Quiz extends React.Component {
         } 
         this.setState({
             queNo:parseInt(e.target.textContent),
-            selectedAnswers: this.state.selectedAnswers
-            // counter:this.state.queNo
         })
     }
 
     getButton = () => {
-        // console.log('getButton');
         let queNo = Array(this.state.attempt).fill(0);
         return queNo.map((val, index) => {
-            // if(this.state.queNo+1>this.state.attempt){
-                return <button className="button" onClick={this._ShowQue} >{index}</button>
-            // }
-           
+                return <button className="button" onClick={this._ShowQue} >{index}</button>    
         })
     }
 
